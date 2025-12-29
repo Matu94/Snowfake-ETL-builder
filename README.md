@@ -7,4 +7,4 @@
 
 ## 📖 Overview
 
-**[Avalanche]** is a native Streamlit app running directly within Snowflake. It empowers users to extract, transform, and load data without writing complex SQL queries or managing external infrastructure. By leveraging Snowflake's compute and Streamlit's interactive UI, this tool bridges the gap between technical data engineering and business agility.
+**Avalanche** is a native Streamlit app running directly within Snowflake. It empowers users to extract, transform, and load data without writing complex SQL queries or managing external infrastructure. By leveraging Snowflake's compute and Streamlit's interactive UI, this tool bridges the gap between technical data engineering and business agility.
