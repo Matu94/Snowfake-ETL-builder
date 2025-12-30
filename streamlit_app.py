@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from utils.snowflake_connector import get_session
 from utils.data_provider import get_data_provider
 from models.table import Table  
@@ -47,24 +48,75 @@ elif selected_layer == "Bronze":
 
 elif selected_layer == "Silver":
     st.header("Silver Layer - Builder")
-    
-
-    #Get Data Provider
     provider = get_data_provider()
 
+    #1: Source Selection 
     st.subheader("1. Select Source")
-    #pretend looking at the Bronze schema
     source_tables = provider.get_tables("BRONZE_DB.RAW") 
     selected_source = st.selectbox("Choose a Source Table", source_tables)
 
-    # Get columns for that source
-    columns = provider.get_columns(selected_source)
-    st.write(f"**Source Columns from {selected_source}:**")
-    st.json(columns) # Quick way to visualize the data
+    #2: Column Mapping
+    st.subheader("2. Define Transformations")
+    
+    # Get raw columns: [("ID", "NUMBER"), ("NAME", "VARCHAR")...]
+    raw_columns = provider.get_columns(selected_source)
+    
+    # Convert to DataFrame for the Editor
+    # add empty columns for 'Rename To' and 'Transformation Logic'
+    df_cols = pd.DataFrame(raw_columns, columns=["Source Column", "Data Type"])
+    df_cols["Target Column Name"] = df_cols["Source Column"] # Default to same name
+    df_cols["Transformation"] = "" # Empty by default
+    df_cols["Include"] = True # Checkbox to keep/drop column
+
+    # DISPLAY THE EDITOR
+    st.write("Edit the columns below. Uncheck 'Include' to drop a column.")
+    edited_df = st.data_editor(
+        df_cols,
+        column_config={
+            "Include": st.column_config.CheckboxColumn("Keep?", help="Select to include in target"),
+            "Source Column": st.column_config.TextColumn("Source", disabled=True), # Read-only
+            "Data Type": st.column_config.TextColumn("Type", disabled=True),       # Read-only
+            "Target Column Name": st.column_config.TextColumn("Target Name"),
+            "Transformation": st.column_config.TextColumn("SQL Logic (Optional)", help="e.g. CAST(x AS INT) or UPPER(x)"),
+        },
+        hide_index=True,
+        use_container_width=True
+    )
+
+    # 3: SQL Generation Logic ---
+    st.divider()
+    st.subheader("3. Preview SQL")
+    
+    if st.button("Preview Projection SQL"):
+        #need to loop through the edited rows and build the SELECT list
+        select_parts = []
+        
+        for index, row in edited_df.iterrows():
+            if row["Include"]:
+                src = row["Source Column"]
+                tgt = row["Target Column Name"]
+                logic = row["Transformation"]
+                
+                # Logic: If there is a transformation, use it. Otherwise use source column.
+                
+                if logic:
+                    col_sql = f"{logic} AS {tgt}"
+                elif src != tgt:
+                    col_sql = f"{src} AS {tgt}"
+                else:
+                    col_sql = src 
+                
+                select_parts.append(col_sql)
+        
+        # Join them with commas
+        final_select = "SELECT \n    " + ",\n    ".join(select_parts) + f"\nFROM {selected_source}"
+        
+        st.code(final_select, language="sql")
+
 
     st.divider() #Add a visual line
 
-    st.subheader("2. Define Target")
+    st.subheader("4. Define Target")
     obj_type = st.selectbox("Type", ["Table", "View", "Dynamic Table"])
 
 
