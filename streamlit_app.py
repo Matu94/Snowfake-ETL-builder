@@ -116,42 +116,79 @@ elif selected_layer == "Silver":
 
     st.divider() #Add a visual line
 
-    st.subheader("4. Define Target")
-    obj_type = st.selectbox("Type", ["Table", "View", "Dynamic Table"])
+    st.subheader("4. Review & Configure")
 
+    #use a distinct button to "Lock in and save" the transformation
+    if st.button("Generate & Lock SQL"):
+        # 1. Re-calculate the SQL (same logic as before)
+        select_parts = []
+        for index, row in edited_df.iterrows():
+            if row["Include"]:
+                src = row["Source Column"]
+                tgt = row["Target Column Name"]
+                logic = row["Transformation"]
+                
+                if logic:
+                    col_sql = f"{logic} AS {tgt}"
+                elif src != tgt:
+                    col_sql = f"{src} AS {tgt}"
+                else:
+                    col_sql = src
+                select_parts.append(col_sql)
+        
+        final_select = "SELECT \n    " + ",\n    ".join(select_parts) + f"\nFROM {selected_source}"
+        
+        #2. SAVE IT TO THE BACKPACK (Session State!!)
+        st.session_state['generated_sql'] = final_select
+        st.success("SQL Generated! Scroll down to configure deployment.")
 
-    if obj_type == "Dynamic Table":
-        # Create a form so the app doesn't reload on every keystroke
-        with st.form("dt_form"):
-            col1, col2 = st.columns(2) # Make it look nice with 2 columns
-            
+    # The Intelligent Form 
+    # Only show this form if we have generated SQL in the "backpack"
+    if 'generated_sql' in st.session_state:
+        
+        # Show the SQL being used
+        st.info("Using the following logic:")
+        st.code(st.session_state['generated_sql'], language="sql")
+
+        st.subheader("4. Deploy Object")
+        
+        #wrap the creation in a form
+        with st.form("deployment_form"):
+            col1, col2 = st.columns(2)
             with col1:
-                name_input = st.text_input("Table Name")
-                schema_input = st.text_input("Schema", value="SILVER_DB.CLEAN")
-                wh_input = st.selectbox("Warehouse", ["COMPUTE_WH", "ETL_WH"])
+                obj_type = st.selectbox("Object Type", ["Dynamic Table", "View", "Table"])
+                tgt_schema = st.text_input("Target Schema", value="SILVER_DB.CLEAN")
+                tgt_name = st.text_input("Target Name", value=f"CLEAN_{selected_source}")
             
             with col2:
-                lag_input = st.text_input("Target Lag", value="1 minute")
-            
-            # Text area for the SQL Logic
-            sql_input = st.text_area("Select Statement (Logic)", height=150)
-            
-            # The Submit Button
-            submitted = st.form_submit_button("Generate DDL")
-            
-            if submitted:
-                # Instantiate a fake dynamictable
-                # use the variables from the form (name_input, etc.) 
-                new_dt = DynamicTable(
-                    name=name_input,
-                    schema=schema_input,
-                    columns=sql_input,      
-                    warehouse=wh_input,     
-                    target_lag=lag_input    
-                )
+                wh = st.selectbox("Warehouse", ["COMPUTE_WH", "ETL_WH"])
+                lag = st.text_input("Target Lag", value="1 minute")
+
+            # The Grand Finale Button
+            deploy_clicked = st.form_submit_button("Deploy to Snowflake")
+
+            if deploy_clicked:
+                # 1. Instantiate the correct Object based on dropdown
+                if obj_type == "Dynamic Table":
+                    new_obj = DynamicTable(tgt_name, tgt_schema, st.session_state['generated_sql'], wh, lag)
+                elif obj_type == "View":
+                    new_obj = View(tgt_name, tgt_schema, st.session_state['generated_sql'])
+                else:
+                    # Table logic might be different (CTAS), but let's assume CTAS for now
+                    new_obj = Table(tgt_name, tgt_schema, st.session_state['generated_sql'])
+
+                # 2. Get the Final DDL
+                final_ddl = new_obj.create_ddl()
+
+                # 3. Simulate Execution
+                st.toast("Validating Syntax...", icon="🔄")
                 
-                st.success("Object generated successfully!")
-                st.code(new_dt.create_ddl(), language='sql')
+                # real app run: session.sql(final_ddl).collect()
+                st.success(f"Successfully created {obj_type}: {tgt_name}")
+                st.code(final_ddl, language="sql")
+                
+                # Optional: Clear state to start over
+                # del st.session_state['generated_sql']
 
 
 elif selected_layer == "Gold":
