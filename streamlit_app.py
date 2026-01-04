@@ -60,7 +60,7 @@ elif page == "Create New Object":
         with col3:
             if obj_type == "Dynamic Table":
                 target_lag = st.text_input("Target lag:", placeholder="e.g. 10 min")
-                warehouse = st.text_input("Warehouse:", placeholder="e.g. WH_ADHOC")
+                warehouse = st.text_input("Warehouse:", placeholder="e.g. COMPUTE_WH")
 
     st.divider()
 
@@ -131,7 +131,7 @@ elif page == "Create New Object":
             rule = f"{row['Transformation Rule']} AS {row['Column Name']}" if row['Transformation Rule'] else row['Column Name']
             
             #This will now use whatever is in the cell, e.g. "NUMBER(38,0)"
-            col_str = f"{rule} {row['Data Type']}"
+            col_str = f"{rule}::{row['Data Type']}"
             
             if not row["Nullable"]:
                 col_str += " NOT NULL"
@@ -156,7 +156,7 @@ elif page == "Create New Object":
         result = View(
             schema = target_schema, 
             name = target_name, 
-            columns=cols_names_str,
+            columns=cols_sql,
             col_names=cols_names_str,
             source_object = f"{editor_source_schema}.{editor_source_table}")
         st.code(result.create_ddl(), language='sql')
