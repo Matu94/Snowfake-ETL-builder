@@ -5,6 +5,7 @@ from utils.data_provider import get_data_provider
 from models.table import Table  
 from models.view import View
 from models.dynamic_table import DynamicTable
+from components.table_editor import create_table
 
 
 #   !!!!!!!!    Page Config     !!!!!!!!
@@ -126,12 +127,15 @@ elif page == "Create New Object":
     ##########################################################  4. Generate DDL   ########################################################## 
     col_definitions = []
     col_names_only = [] #For view DDL
-    for index, row in editor_result.iterrows():
+    for index, row in editor_result.iterrows(): #need index to have string as a result, not tuple
         if row["Column Name"]: 
             rule = f"{row['Transformation Rule']} AS {row['Column Name']}" if row['Transformation Rule'] else row['Column Name']
             
             #This will now use whatever is in the cell, e.g. "NUMBER(38,0)"
-            col_str = f"{rule}::{row['Data Type']}"
+            if obj_type == 'View':
+                col_str = f"{rule}::{row['Data Type']}"
+            else:
+                col_str = f"{rule} {row['Data Type']}"
             
             if not row["Nullable"]:
                 col_str += " NOT NULL"
@@ -203,3 +207,5 @@ elif page == "Sandbox":
     for col_name, col_type in test:
         st.info(col_name)
         st.info(col_type)
+
+    st.code(create_table('testschema','testable'), language='sql')
