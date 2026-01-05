@@ -10,6 +10,17 @@ from components.view_editor import create_view
 from components.dynamictable_editor import create_dynamic_table
 
 
+# ========================================================================================================================================================================
+#                                       THIS IS JUST A SANDBOX, SORRY. PLEASE CHECK STREAMLIT_APP.PY
+# ========================================================================================================================================================================
+
+
+
+
+
+
+
+
 #   !!!!!!!!    Page Config     !!!!!!!!
 st.set_page_config(page_title="Snowflake Builder", layout="wide")
 st.title("❄️ Snowflake Object Builder")
