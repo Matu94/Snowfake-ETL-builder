@@ -5,6 +5,7 @@ from utils.data_provider import get_data_provider
 from components.table_editor import create_table
 from components.view_editor import create_view
 from components.dynamictable_editor import create_dynamic_table
+from components.deploy_ui import display_deploy_button
 
 
 #   !!!!!!!!    Page Config     !!!!!!!!
@@ -65,14 +66,20 @@ elif page == "Create New Object":
 
 
     if obj_type == 'Table':
-        st.code(create_table(target_schema,target_name), language='sql')
+        final_ddl = create_table(target_schema,target_name)
+        st.code(final_ddl, language='sql')
+
     elif obj_type == 'View':
-        st.code(create_view(editor_source_schema,editor_source_table,target_schema,target_name), language='sql')
+        final_ddl = create_view(editor_source_schema,editor_source_table,target_schema,target_name)
+        st.code(final_ddl, language='sql')
+
     elif obj_type == 'Dynamic Table':
-        st.code(create_dynamic_table(editor_source_schema,editor_source_table,target_schema,target_name,warehouse,target_lag), language='sql')
+        final_ddl = create_dynamic_table(editor_source_schema,editor_source_table,target_schema,target_name,warehouse,target_lag)
+        st.code(final_ddl, language='sql')
 
     
     st.divider()
+    display_deploy_button(final_ddl)
 
 # ==========================================
 # PAGE 3: MODIFY EXISTING 
