@@ -9,6 +9,7 @@ from components.home_ui import home
 #   !!!!!!!!    Page Config     !!!!!!!!
 st.set_page_config(page_title="Igloo", layout="wide")
 st.title("❄️Igloo - Snowflake Object Management Tool")
+st.divider()
 
 st.sidebar.title("Menu")
 page = st.sidebar.radio("Go to", ["Home", "Create New Object", "Modify Existing", "Sandbox"])
@@ -23,7 +24,6 @@ provider = get_data_provider()
 # ==========================================
 if page == "Home":
     home()
-
 
 
 # ==========================================
