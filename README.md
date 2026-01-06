@@ -2,9 +2,85 @@
 
 > **A streamlined, low-code object management solution built entirely inside Snowflake using Streamlit.**
 
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow) ![Snowflake](https://img.shields.io/badge/Built%20on-Snowflake-blue) ![Streamlit](https://img.shields.io/badge/Frontend-Streamlit-red)
+![Status](https://img.shields.io/badge/Status-In%20Development-yellow) ![Snowflake](https://img.shields.io/badge/Built%20on-Snowflake-blue) ![Streamlit](https://img.shields.io/badge/Frontend-Streamlit-red) ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
 
 
 ## 📖 Overview
 
 **Igloo** is a Streamlit-powered GUI designed to streamline the creation and modification of Snowflake objects. It creates a visual layer over raw DDL, allowing users to easily manage Tables, Dynamic Tables, and Views. Future updates will support orchestration objects like Tasks and Pipes, making it a complete workbench for Snowflake schema management.
+
+
+## Features
+
+### Connection Dashboard
+- Real-time **connection status** monitoring.
+- Visual display of current **Role**, **Warehouse**, and **Database**.
+- Secure credential management via Streamlit secrets.
+
+### Object Builder
+A Wizard-style interface to create objects from scratch or based on existing data:
+- **Tables:** Define columns, types, and nullability manually.
+- **Views:** Select source schemas/tables and apply simple column mappings.
+- **Dynamic Tables:** Configure target lag and warehouse settings visually.
+
+### Low-Code Data Editor
+- **Interactive Grid:** Add, remove, and modify columns using a spreadsheet-like interface.
+- **Smart Type Detection:** Automatically fetches and suggests data types from source tables.
+
+### One-Click Deployment
+- Generates production-ready DDL.
+- **Preview Mode:** Review the SQL code before deploying.
+- **Direct Execution:** Deploys the object to Snowflake with a single click.
+
+---
+
+## Project Structure
+
+```text
+Snowfake-Igloo/
+├── streamlit_app.py        # Main application entry point (Traffic Controller)
+├── components/             # UI Components & Widgets
+│   ├── home_ui.py          # Dashboard & Connection Status
+│   ├── builders.py         # Object Creation Wizards (Logic + UI)
+│   ├── shared_grid.py      # Reusable Data Editor Component
+│   └── deploy_ui.py        # SQL Deployment & Execution Button
+├── models/                 # Python Classes for Snowflake Objects
+│   ├── table.py
+│   ├── view.py
+│   └── dynamic_table.py
+├── utils/                  # Backend Utilities
+│   ├── data_provider.py    # Fetches Schemas, Tables & Columns
+│   └── snowflake_connector.py # Handles Session & Auth
+└── .streamlit/             # Configuration
+    ├── config.toml         # Theme & UI Settings
+    └── secrets.toml        # Credentials (Not committed)
+```
+
+## Configure Secrets
+Create a file named `.streamlit/secrets.toml` in the root directory and add your Snowflake credentials:
+
+```toml
+[snowflake]
+user = "YOUR_USER"
+password = "YOUR_PASSWORD"
+account = "YOUR_ACCOUNT_IDENTIFIER"
+role = "YOUR_ROLE"
+warehouse = "YOUR_WAREHOUSE"
+database = "YOUR_DATABASE"
+schema = "YOUR_SCHEMA"
+```
+
+
+## Future Roadmap
+
+- [ ] **Column Transformations:** The option to implement column level transformation (e.g., `LEFT()`).
+- [ ] **Join objects:** The opportunity to use join with other objects.
+- [ ] **Modify Existing Objects:** Load an existing table/view and apply changes.
+- [ ] **Orchestration Objects:** UI support for creating `Tasks` and `Streams`.
+
+---
+
+
+## License
+
+This project is open-source.
