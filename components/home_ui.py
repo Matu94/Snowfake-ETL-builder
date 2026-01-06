@@ -45,7 +45,7 @@ def home():
             st.caption("Environment is healthy and ready for deployment.")
 
     else:
-        #warning card if disconnected
+        #warning card if disconnected s
         with st.container(border=True):
             st.error("No active Snowflake session found.")
             st.markdown("Please check your `.streamlit/secrets.toml` configuration or ensure your key pair is valid.")
