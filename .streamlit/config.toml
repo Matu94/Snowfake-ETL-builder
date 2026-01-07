@@ -3,4 +3,4 @@ base = "dark"
 primaryColor = "#ff4b4b" #Deploy button color
 backgroundColor = "#0E1117" #dark background
 secondaryBackgroundColor = "#262730" #Lighter background for inputs/sidebar
-textColor = "#FAFAFA"
+textColor = "#c9f0feff"
