@@ -45,7 +45,7 @@ def create_view(editor_source_schema,editor_source_table,target_schema,target_na
         default_data,
         num_rows="dynamic",
         column_config={
-            "src_col_nm": st.column_config.TextColumn("Source Column", required=True),
+            "src_col_nm": st.column_config.TextColumn("Source Column", required=True, disabled = True),
             "new_col_nm": st.column_config.TextColumn("New Column Name", required=True),
             "transformation": st.column_config.TextColumn("Transformation", help = "eg. 'LEFT()'"),
             "data_type": st.column_config.SelectboxColumn(
