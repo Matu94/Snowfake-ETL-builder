@@ -74,7 +74,7 @@ class RealDataProvider:
             df = self.session.sql(f"DESCRIBE TABLE {schema_name}.{table_name}").collect()
         elif obj_type == 'View':
             df = self.session.sql(f"DESCRIBE VIEW {schema_name}.{table_name}").collect()
-        columns = [(row["name"], row["type"]) for row in df]
+        columns = [(row["name"], row["type"], row["null?"]) for row in df]
         return columns
 
 # Factory function to get the provider

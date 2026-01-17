@@ -6,6 +6,7 @@ from components.table_editor import create_table
 from components.view_editor import create_view
 from components.dynamictable_editor import create_dynamic_table
 from components.deploy_ui import display_deploy_button
+from components.table_editor import modify_table
 
 
 session = get_session()
@@ -113,6 +114,34 @@ def modify_object():
         with c3:
             if obj_type == "View":
                 object_name = st.selectbox("Select Object", provider.get_views(selected_schema))
-            elif obj_type in ("Table", "Dynamic Table"):
-                object_name = st.selectbox("Select Object", provider.get_tables(selected_schema))
+            elif obj_type == "Table":
+                object_name = st.selectbox("Select Object", provider.get_tables(selected_schema, 'normal'))
+            elif obj_type == "Dynamic Table":
+                object_name = st.selectbox("Select Object", provider.get_tables(selected_schema, 'dynamic'))
+
+    
+    
+    #EDITORS:
+    st.subheader(f"Design {obj_type} Columns")
+    
+    final_ddl = None # Initialize variable
+
+    if obj_type == 'Table':
+        
+        final_ddl = modify_table(selected_schema, object_name)
+
+    
+
+
+
+    # PREVIEW & DEPLOY ---
+    if final_ddl:
+        st.divider()
+        st.markdown("#### Review & Deploy")
+        
+        st.code(final_ddl, language='sql')
+        
+        #Deployment Button
+        display_deploy_button(final_ddl)
+    
     return None

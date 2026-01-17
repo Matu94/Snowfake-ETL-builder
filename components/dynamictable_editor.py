@@ -18,7 +18,7 @@ def create_dynamic_table(editor_source_schema,editor_source_table,target_schema,
     #need this because i gave the coice to select the base types, but already existing can have more precies ones like NUMBER(38,0)
     #Fetch ALL columns at once
     rows_list = []
-    source_cols = provider.get_columns(editor_source_schema, editor_source_table, 'View')
+    source_cols = provider.get_columns(editor_source_schema, editor_source_table, 'Dynamic Table')
     #Build the rows from source 
     #rows_list is a list, and the result of get_columns is also a list with 2 stuffs in it. first is the column name, second is the type. So with this for loop i can build the required list
     for col_name, col_type in source_cols:
