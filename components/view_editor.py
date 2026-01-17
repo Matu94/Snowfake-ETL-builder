@@ -105,7 +105,7 @@ def modify_view(selected_schema,selected_object_name):
         rows_list.append({
             "src_col_nm": col_name,
             "new_col_nm": col_name,
-            "transformation": "",
+            "transformation": provider.get_transform_by_alias(selected_schema,selected_object_name,'View',col_name),
             "data_type": col_type #This can be 'NUMBER(38,0)', wich is not part of the base types
         })
 
@@ -156,15 +156,18 @@ def modify_view(selected_schema,selected_object_name):
     cols_sql = ",\n\t".join(col_definitions)          #Result: "ID NUMBER, NAME VARCHAR"
     cols_names_str = ",\n\t".join(col_names_only)      #Result: "ID, NAME"  
 
+    #the function returns both, but if i only need one, i can use _ so that will be ignored, like: schemaname, _ = fun()
+    source_schema_name, source_obj_name = provider.get_source(selected_schema,selected_object_name,'View')
+    source_object = f"{source_schema_name}.{source_obj_name}"
 
 
     #5. Object display  
     result = View(
-        schema = target_schema, 
-        name = target_name, 
+        schema = selected_schema, 
+        name = selected_object_name, 
         columns=cols_sql,
         col_names=cols_names_str,
-        source_object = f"{editor_source_schema}.{editor_source_table}")
+        source_object = source_object)
     
     
     return result.create_ddl()

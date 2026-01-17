@@ -140,6 +140,50 @@ class RealDataProvider:
             
             return []
         
+    #Helper method for transform, to be able to get the transformation based on the "alias"
+    def get_transform_by_alias(self, schema_name, obj_name, obj_type, alias):
+        transformations = self.get_transform(schema_name, obj_name, obj_type)
+     
+        for tf in transformations:
+            if tf['alias'].upper() == alias.upper():
+                return tf['transformation'].upper()
+     
+        return None  #or return {'alias': alias, 'type': None, 'transformation': None}
+    
+
+    #Returns the source schema and obj name - use this in MODIFIY VIEW
+    def get_source(self, schema_name, obj_name, obj_type):
+        if obj_type == 'View':
+            df = self.session.sql(f"SELECT GET_DDL('VIEW', '{schema_name}.{obj_name}')").collect()
+            ddl = df[0][0]  # Extract the DDL string
+
+        # Find the FROM clause
+        from_pos = ddl.upper().find('FROM')
+
+        if from_pos == -1:
+            return None, None
+
+        #Extract everything after FROM
+        after_from = ddl[from_pos + 4:].strip()
+
+        #Get the first word (the source table/view), stop at semicolon, space, or newline
+        source_full = after_from.split(';')[0].split()[0].strip()
+
+        #Split by dot to separate schema and object name
+        parts = source_full.split('.')
+
+        if len(parts) == 2:
+            obj_source_schema = parts[0]
+            obj_source_name = parts[1]
+        elif len(parts) == 3:
+            # If it includes database name: DATABASE.SCHEMA.TABLE
+            obj_source_schema = parts[1]
+            obj_source_name = parts[2]
+        else:
+            return None, None
+
+        return obj_source_schema, obj_source_name
+        
 
 # Factory function to get the provider
 def get_data_provider():

@@ -49,8 +49,13 @@ elif page == "Sandbox":
     st.header("Sandbox")
     st.write("This section is my playground")
 
+    tf = provider.get_transform('ANALYTICS','NEWVIEW','View')
+    st.code(tf)
+    st.code(tf[1])
 
-    st.code(provider.get_transform('ANALYTICS','NEWVIEW','View'))
-    
+    st.code(provider.get_transform_by_alias('ANALYTICS','NEWVIEW','View','ID')) 
+
+    st.code(provider.get_source('ANALYTICS','NEWVIEW','View'))
+
 
 
