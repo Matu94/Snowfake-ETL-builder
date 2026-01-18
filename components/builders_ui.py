@@ -3,9 +3,13 @@ import pandas as pd
 from utils.snowflake_connector import get_session
 from utils.data_provider import get_data_provider
 from components.table_editor import create_table
+from components.table_editor import modify_table
 from components.view_editor import create_view
+from components.view_editor import modify_view
 from components.dynamictable_editor import create_dynamic_table
+from components.dynamictable_editor import modify_dynamic_table
 from components.deploy_ui import display_deploy_button
+
 
 
 session = get_session()
@@ -93,5 +97,62 @@ def create_object():
 
 
 
+
 def modify_object():
+    st.markdown("### Modify an existing object")
+    st.markdown("Configure your Snowflake object below.")
+
+    #TARGET CONFIGURATION
+    with st.container(border=True):
+        st.markdown("#### 1. Target Definition")
+        
+        c1, c2, c3 = st.columns([1, 1, 2]) #Uneven columns for better spacing
+        
+        with c1:
+            obj_type = st.selectbox("Object Type", ["Table", "View", "Dynamic Table"])
+        
+        with c2:
+            selected_schema = st.selectbox("Select Schema", provider.get_schemas(database))
+        
+        with c3:
+            if obj_type == "View":
+                object_name = st.selectbox("Select Object", provider.get_views(selected_schema))
+            elif obj_type == "Table":
+                object_name = st.selectbox("Select Object", provider.get_tables(selected_schema, 'normal'))
+            elif obj_type == "Dynamic Table":
+                object_name = st.selectbox("Select Object", provider.get_tables(selected_schema, 'dynamic'))
+
+    
+    
+    #EDITORS:
+    st.subheader(f"Design {obj_type} Columns")
+    
+    final_ddl = None # Initialize variable
+
+    if obj_type == 'Table':
+        
+        final_ddl = modify_table(selected_schema, object_name)
+
+    if obj_type == 'View':
+        
+        final_ddl = modify_view(selected_schema, object_name)
+
+    if obj_type == 'Dynamic Table':
+        final_ddl = modify_dynamic_table(selected_schema, object_name)
+
+
+    
+
+
+
+    # PREVIEW & DEPLOY ---
+    if final_ddl:
+        st.divider()
+        st.markdown("#### Review & Deploy")
+        
+        st.code(final_ddl, language='sql')
+        
+        #Deployment Button
+        display_deploy_button(final_ddl)
+    
     return None
