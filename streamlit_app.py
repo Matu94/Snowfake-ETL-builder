@@ -7,6 +7,7 @@ from components.builders_ui import modify_object
 from components.home_ui import home
 
 
+
 #   !!!!!!!!    Page Config     !!!!!!!!
 st.set_page_config(page_title="Igloo", layout="wide")
 st.title("❄️Igloo - Snowflake Object Management Tool")
@@ -51,11 +52,10 @@ elif page == "Sandbox":
 
     tf = provider.get_transform('ANALYTICS','NEWVIEW','View')
     st.code(tf)
-    st.code(tf[1])
-
     st.code(provider.get_transform_by_alias('ANALYTICS','NEWVIEW','View','ID')) 
-
-    st.code(provider.get_source('ANALYTICS','NEWVIEW','View'))
-
-
+    
+    st.divider()
+    st.code(provider.get_transform('ANALYTICS','testdt','Dynamic Table'))
+    st.code(provider.get_transform('ANALYTICS','testdt','Dynamic Table')[0]['transformation'])
+    st.code(provider.get_transform_by_alias('ANALYTICS','testdt','Dynamic Table','ID')),
 

@@ -134,7 +134,7 @@ def modify_view(selected_schema,selected_object_name):
             )
         },
         use_container_width=True,
-        key="view_create_editor"     #unique ID badge for this 'widget' 
+        key="view_modify_editor"     #unique ID badge for this 'widget' 
     )   
 
 
