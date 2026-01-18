@@ -23,7 +23,7 @@ def push_to_github(file_path, file_content, commit_message):
                 sha=contents.sha,
                 branch=branch
             )
-            return f"Updated {file_path} on GitHub!"
+            return f"Success! Updated {file_path} on GitHub!"
             
         except:
             #CREATE new file
@@ -33,7 +33,7 @@ def push_to_github(file_path, file_content, commit_message):
                 content=file_content,
                 branch=branch
             )
-            return f"Created {file_path} on GitHub!"
+            return f"Success! Created {file_path} on GitHub!"
 
     except Exception as e:
         return f"Git Error: {str(e)}"

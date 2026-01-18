@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.snowflake_connector import get_session
+from utils.git_manager import push_to_github
 
 
 def display_deploy_button(ddl_sql):
@@ -31,3 +32,21 @@ def display_deploy_button(ddl_sql):
             
         except Exception as e:
             st.error(f"Deployment Failed: {e}")
+
+        
+        #Git push
+        with st.spinner("Pushing to GitHub..."):
+            #Construct a clean path: objects/SCHEMA/TYPE/NAME.sql
+            file_path = f"snowflake_objects/testschema/testtype/testname.sql".lower()
+            #file_path = f"snowflake_objects/{schema_name}/{object_type}/{object_name}.sql".lower()
+            
+            git_result = push_to_github(
+                file_path=file_path, 
+                file_content=ddl_sql, 
+                commit_message="commit_msg"
+            )
+            
+            if "Success!" in git_result:
+                st.success(git_result)
+            else:
+                st.error(git_result)
