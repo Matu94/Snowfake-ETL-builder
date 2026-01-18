@@ -89,9 +89,10 @@ def create_object():
         st.markdown("#### Review & Deploy")
         
         st.code(final_ddl, language='sql')
-        
+        commitmsg = st.text_input("Commit message", value="Commit msg")
         #Deployment Button
-        display_deploy_button(final_ddl)
+        display_deploy_button(final_ddl,target_schema,obj_type,target_name,commitmsg)
+
     
     return None
 
@@ -152,7 +153,8 @@ def modify_object():
         
         st.code(final_ddl, language='sql')
         
+        commitmsg = st.text_input("Commit message", value="Commit msg")
         #Deployment Button
-        display_deploy_button(final_ddl)
+        display_deploy_button(final_ddl,selected_schema,obj_type,object_name,commitmsg)
     
     return None
